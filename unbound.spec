@@ -86,7 +86,8 @@ fi
 %doc doc/FEATURES doc/ietf67-design-02.odp doc/ietf67-design-02.pdf
 %doc doc/requirements.txt doc/TODO
 %attr(754,root,root) /etc/rc.d/init.d/unbound
-%{_sysconfdir}/%{name}/unbound.conf
+%dir %{_sysconfdir}/%{name}
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/unbound.conf
 %attr(755,root,root) %{_libdir}/libunbound.so.*.*.*
 %attr(755,root,root) %{_sbindir}/unbound
 %attr(755,root,root) %{_sbindir}/unbound-checkconf
