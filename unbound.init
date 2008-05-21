@@ -1,0 +1,126 @@
+#!/bin/sh
+#
+# unbound	This shell script takes care of starting and stopping
+#		unbound (DNS server).
+#
+# chkconfig:   - 14 86
+# description:	unbound is a Domain Name Server (DNS) \
+#		that is used to resolve host names to IP addresses.
+#
+### END INIT INFO
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+pidfile="/var/unbound/unbound.pid"
+
+[ -e /etc/sysconfig/unbound ] && . /etc/sysconfig/unbound
+
+lockfile=/var/lock/subsys/unbound
+
+start() {
+    [ -x /usr/sbin/unbound ] || exit 5
+    [ -f /etc/unbound/unbound.conf ] || exit 6
+    echo -n $"Starting unbound: "
+
+    # setup root jail
+    if [ -s /etc/localtime ]; then 
+	[ -d /var/lib/unbound/etc ] || mkdir -p /var/lib/unbound/etc ;
+	if [ ! -e /var/lib/unbound/etc/localtime ] || /usr/bin/cmp -s /etc/localtime /var/lib/unbound/etc/localtime; then
+	    cp -fp /etc/localtime /var/lib/unbound/etc/localtime
+	fi;
+    fi;
+    if [ -s /etc/resolv.conf ]; then
+	[ -d /var/lib/unbound/etc ] || mkdir -p /var/lib/unbound/etc ;
+	if [ ! -e /var/lib/unbound/etc/resolv.conf ] || /usr/bin/cmp -s /etc/resolv.conf /var/lib/unbound/etc/resolv.conf; then
+	    cp -fp /etc/resolv.conf /var/lib/unbound/etc/resolv.conf
+	fi;
+    fi;
+    if ! egrep -q '^/[^[:space:]]+[[:space:]]+'/var/lib/unbound'/dev/log' /proc/mounts; then
+	[ -d /var/lib/unbound/dev ] || mkdir -p /var/lib/unbound/dev ;
+	[ -e /var/lib/unbound/dev/log ] || touch /var/lib/unbound/dev/log
+	mount --bind -n /dev/log /var/lib/unbound/dev/log >/dev/null 2>&1;
+    fi;
+    if ! egrep -q '^/[^[:space:]]+[[:space:]]+'/var/lib/unbound'/dev/random' /proc/mounts; then
+	[ -d /var/lib/unbound/dev ] || mkdir -p /var/lib/unbound/dev ;
+	[ -e /var/lib/unbound/dev/random ] || touch /var/lib/unbound/dev/random
+	mount --bind -n /dev/random /var/lib/unbound/dev/random >/dev/null 2>&1;
+    fi;
+
+    # if not running, start it up here
+    daemon /usr/sbin/unbound
+    retval=$?
+    echo
+    [ $retval -eq 0 ] && touch $lockfile
+    return $retval
+}
+
+stop() {
+    echo -n $"Stopping unbound: "
+    # stop it here, often "killproc unbound"
+    killproc -p $pidfile unbound
+    retval=$?
+    echo
+    [ $retval -eq 0 ] && rm -f $lockfile
+    if egrep -q '^/[^[:space:]]+[[:space:]]+'/var/lib/unbound'/dev/log' /proc/mounts; then
+	umount /var/lib/unbound/dev/log >/dev/null 2>&1
+    fi;
+    if egrep -q '^/[^[:space:]]+[[:space:]]+'/var/lib/unbound'/dev/random' /proc/mounts; then
+	umount /var/lib/unbound/dev/random >/dev/null 2>&1
+    fi;
+    return $retval
+}
+
+restart() {
+    stop
+    start
+}
+
+reload() {
+    kill -HUP `cat $pidfile`
+}
+
+force_reload() {
+    restart
+}
+
+rh_status() {
+    # run checks to determine if the service is running or use generic status
+    status -p $pidfile unbound
+}
+
+rh_status_q() {
+    rh_status -p $pidfile >/dev/null 2>&1
+}
+
+case "$1" in
+    start)
+        rh_status_q && exit 0
+        $1
+        ;;
+    stop)
+        rh_status_q || exit 0
+        $1
+        ;;
+    restart)
+        $1
+        ;;
+    reload)
+        rh_status_q || exit 7
+        $1
+        ;;
+    force-reload)
+        force_reload
+        ;;
+    status)
+        rh_status
+        ;;
+    condrestart|try-restart)
+        rh_status_q || exit 0
+        restart
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart|reload|force-reload}"
+        exit 2
+esac
+exit $?
