@@ -1,126 +1,102 @@
 #!/bin/sh
 #
-# unbound	This shell script takes care of starting and stopping
+# unbound		This shell script takes care of starting and stopping
 #		unbound (DNS server).
 #
-# chkconfig:   - 14 86
-# description:	unbound is a Domain Name Server (DNS) \
-#		that is used to resolve host names to IP addresses.
+# chkconfig:	345 14 89
 #
-### END INIT INFO
+# description:	unbound (BIND) is a Domain Name Server (DNS) \
+#		that is used to resolve host names to IP addresses.
 
-# Source function library.
+# Source function library
 . /etc/rc.d/init.d/functions
 
-pidfile="/var/unbound/unbound.pid"
+# Source networking configuration
+. /etc/sysconfig/network
 
-[ -e /etc/sysconfig/unbound ] && . /etc/sysconfig/unbound
+UNBOUND_OPT=""
 
-lockfile=/var/lock/subsys/unbound
+# Try get config..
+[ -f /etc/sysconfig/unbound ] && . /etc/sysconfig/unbound
+
+# Check that networking is up.
+if is_yes "${NETWORKING}"; then
+	if [ ! -f /var/lock/subsys/network -a "$1" != stop -a "$1" != status ]; then
+		msg_network_down "Unbound"
+		exit 1
+	fi
+else
+	exit 0
+fi
+
+# Sanity check
+[ -e /etc/unbound/unbound.conf ] || exit 0
 
 start() {
-    [ -x /usr/sbin/unbound ] || exit 5
-    [ -f /etc/unbound/unbound.conf ] || exit 6
-    echo -n $"Starting unbound: "
-
-    # setup root jail
-    if [ -s /etc/localtime ]; then 
-	[ -d /var/lib/unbound/etc ] || mkdir -p /var/lib/unbound/etc ;
-	if [ ! -e /var/lib/unbound/etc/localtime ] || /usr/bin/cmp -s /etc/localtime /var/lib/unbound/etc/localtime; then
-	    cp -fp /etc/localtime /var/lib/unbound/etc/localtime
-	fi;
-    fi;
-    if [ -s /etc/resolv.conf ]; then
-	[ -d /var/lib/unbound/etc ] || mkdir -p /var/lib/unbound/etc ;
-	if [ ! -e /var/lib/unbound/etc/resolv.conf ] || /usr/bin/cmp -s /etc/resolv.conf /var/lib/unbound/etc/resolv.conf; then
-	    cp -fp /etc/resolv.conf /var/lib/unbound/etc/resolv.conf
-	fi;
-    fi;
-    if ! egrep -q '^/[^[:space:]]+[[:space:]]+'/var/lib/unbound'/dev/log' /proc/mounts; then
-	[ -d /var/lib/unbound/dev ] || mkdir -p /var/lib/unbound/dev ;
-	[ -e /var/lib/unbound/dev/log ] || touch /var/lib/unbound/dev/log
-	mount --bind -n /dev/log /var/lib/unbound/dev/log >/dev/null 2>&1;
-    fi;
-    if ! egrep -q '^/[^[:space:]]+[[:space:]]+'/var/lib/unbound'/dev/random' /proc/mounts; then
-	[ -d /var/lib/unbound/dev ] || mkdir -p /var/lib/unbound/dev ;
-	[ -e /var/lib/unbound/dev/random ] || touch /var/lib/unbound/dev/random
-	mount --bind -n /dev/random /var/lib/unbound/dev/random >/dev/null 2>&1;
-    fi;
-
-    # if not running, start it up here
-    daemon /usr/sbin/unbound
-    retval=$?
-    echo
-    [ $retval -eq 0 ] && touch $lockfile
-    return $retval
+	# Check if the service is already running?
+	if [ ! -f /var/lock/subsys/unbound ]; then
+		msg_starting "Unbound"
+	 	daemon unbound \
+			-c /etc/unbound/unbound.conf $UNBOUND_OPT </dev/null
+		RETVAL=$?
+		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/unbound
+	else
+		msg_already_running "Unbound"
+	fi
 }
 
 stop() {
-    echo -n $"Stopping unbound: "
-    # stop it here, often "killproc unbound"
-    killproc -p $pidfile unbound
-    retval=$?
-    echo
-    [ $retval -eq 0 ] && rm -f $lockfile
-    if egrep -q '^/[^[:space:]]+[[:space:]]+'/var/lib/unbound'/dev/log' /proc/mounts; then
-	umount /var/lib/unbound/dev/log >/dev/null 2>&1
-    fi;
-    if egrep -q '^/[^[:space:]]+[[:space:]]+'/var/lib/unbound'/dev/random' /proc/mounts; then
-	umount /var/lib/unbound/dev/random >/dev/null 2>&1
-    fi;
-    return $retval
+	if [ -f /var/lock/subsys/unbound ]; then
+		msg_stopping "Unbound"
+		killproc unbound
+		rm -f /var/lock/subsys/unbound >/dev/null 2>&1
+	else
+		msg_not_running "Unbound"
+	fi
 }
 
-restart() {
-    stop
-    start
-}
-
-reload() {
-    kill -HUP `cat $pidfile`
-}
-
-force_reload() {
-    restart
-}
-
-rh_status() {
-    # run checks to determine if the service is running or use generic status
-    status -p $pidfile unbound
-}
-
-rh_status_q() {
-    rh_status -p $pidfile >/dev/null 2>&1
-}
-
+RETVAL=0
+# See how we were called.
 case "$1" in
-    start)
-        rh_status_q && exit 0
-        $1
-        ;;
-    stop)
-        rh_status_q || exit 0
-        $1
-        ;;
-    restart)
-        $1
-        ;;
-    reload)
-        rh_status_q || exit 7
-        $1
-        ;;
-    force-reload)
-        force_reload
-        ;;
-    status)
-        rh_status
-        ;;
-    condrestart|try-restart)
-        rh_status_q || exit 0
-        restart
-        ;;
-    *)
-        echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart|reload|force-reload}"
-        exit 2
+  start)
+  	start
+	;;
+  stop)
+  	stop
+	;;
+  status)
+	status unbound
+	RETVAL=$?
+	if [ -f /etc/rndc.conf ]; then
+		/usr/sbin/rndc status
+		RET=$?
+		if [ $RET -ne 0 ]; then
+			RETVAL=$RET
+		fi
+	fi
+	;;
+  reload|force-reload)
+	if [ -f /var/lock/subsys/unbound ]; then
+		if [ -f /etc/rndc.conf ]; then
+			run_cmd "$(nls 'Reloading %s service' 'Unbound')" /usr/sbin/rndc reload
+		else
+			msg_reloading "Unbound"
+			killproc unbound -HUP
+			RETVAL=$?
+		fi
+	else
+		msg_not_running "Unbound"
+		exit 7
+	fi
+
+	;;
+  restart)
+	stop
+	start
+	;;
+  *)
+	msg_usage "$0 {start|stop|restart|reload|force-reload|status}"
+	exit 3
 esac
-exit $?
+
+exit $RETVAL
