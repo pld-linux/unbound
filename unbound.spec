@@ -1,12 +1,12 @@
 #
 Summary:	Recursive, validating DNS server
 Name:		unbound
-Version:	1.0.0
+Version:	1.0.1
 Release:	1
 License:	BSD
 Group:		Applications
 Source0:	http://www.unbound.net/downloads/%{name}-%{version}.tar.gz
-# Source0-md5:	05b7532c26e6005f7575d04fc44fb893
+# Source0-md5:	e60c8221768cc79eca8783f01e8cf969
 Source1:	%{name}.init
 URL:		http://unbound.net/
 BuildRequires:	rpmbuild(macros) >= 1.228
