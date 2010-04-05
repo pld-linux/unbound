@@ -36,7 +36,7 @@ start() {
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/unbound ]; then
 		msg_starting "Unbound"
-	 	daemon unbound \
+	 	daemon /usr/sbin/unbound \
 			-c /etc/unbound/unbound.conf $UNBOUND_OPT </dev/null
 		RETVAL=$?
 		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/unbound
