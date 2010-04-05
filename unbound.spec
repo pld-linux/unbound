@@ -1,14 +1,16 @@
 #
 Summary:	Recursive, validating DNS server
 Name:		unbound
-Version:	1.0.1
+Version:	1.4.3
 Release:	1
 License:	BSD
 Group:		Applications
 Source0:	http://www.unbound.net/downloads/%{name}-%{version}.tar.gz
-# Source0-md5:	e60c8221768cc79eca8783f01e8cf969
+# Source0-md5:	2dffdd42f94b8238447a41835439d129
 Source1:	%{name}.init
 URL:		http://unbound.net/
+BuildRequires:	ldns-devel
+BuildRequires:	libevent-devel
 BuildRequires:	rpmbuild(macros) >= 1.228
 Requires(post,preun):	/sbin/chkconfig
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -82,20 +84,23 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc doc/Changelog doc/CREDITS doc/plan doc/example.conf doc/README
-%doc doc/FEATURES doc/ietf67-design-02.odp doc/ietf67-design-02.pdf
-%doc doc/requirements.txt doc/TODO
+%doc doc/Changelog doc/CREDITS doc/control_proto_spec.txt
+%doc doc/example.conf doc/README doc/FEATURES doc/ietf67-design-02.odp
+%doc doc/ietf67-design-02.pdf doc/requirements.txt doc/TODO 
 %attr(754,root,root) /etc/rc.d/init.d/unbound
 %dir %{_sysconfdir}/%{name}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/unbound.conf
 %attr(755,root,root) %{_libdir}/libunbound.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libunbound.so.2
 %attr(755,root,root) %{_sbindir}/unbound
 %attr(755,root,root) %{_sbindir}/unbound-checkconf
+%attr(755,root,root) %{_sbindir}/unbound-control*
 %attr(755,root,root) %{_sbindir}/unbound-host
 %{_mandir}/man1/unbound-host.1*
 %{_mandir}/man5/unbound.conf.5*
 %{_mandir}/man8/unbound-checkconf.8*
 %{_mandir}/man8/unbound.8*
+%{_mandir}/man8/unbound-control.8*
 
 %files devel
 %defattr(644,root,root,755)
