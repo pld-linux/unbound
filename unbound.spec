@@ -1,15 +1,15 @@
 #
 Summary:	Recursive, validating DNS server
 Name:		unbound
-Version:	1.4.3
+Version:	1.4.9
 Release:	1
 License:	BSD
 Group:		Applications
 Source0:	http://www.unbound.net/downloads/%{name}-%{version}.tar.gz
-# Source0-md5:	2dffdd42f94b8238447a41835439d129
+# Source0-md5:	7079e75210c656761d3804a9f2ac7b9f
 Source1:	%{name}.init
 URL:		http://unbound.net/
-BuildRequires:	ldns-devel
+BuildRequires:	ldns-devel >= 1.6.9
 BuildRequires:	libevent-devel
 BuildRequires:	rpmbuild(macros) >= 1.228
 Requires(post,preun):	/sbin/chkconfig
@@ -54,7 +54,7 @@ Statyczna biblioteka unbound.
 %setup -q
 
 %build
-%configure
+%configure 
 %{__make}
 
 %install
@@ -93,6 +93,7 @@ fi
 %attr(755,root,root) %{_libdir}/libunbound.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libunbound.so.2
 %attr(755,root,root) %{_sbindir}/unbound
+%attr(755,root,root) %{_sbindir}/unbound-anchor
 %attr(755,root,root) %{_sbindir}/unbound-checkconf
 %attr(755,root,root) %{_sbindir}/unbound-control*
 %attr(755,root,root) %{_sbindir}/unbound-host
@@ -100,6 +101,7 @@ fi
 %{_mandir}/man5/unbound.conf.5*
 %{_mandir}/man8/unbound-checkconf.8*
 %{_mandir}/man8/unbound.8*
+%{_mandir}/man8/unbound-anchor.8*
 %{_mandir}/man8/unbound-control.8*
 
 %files devel
