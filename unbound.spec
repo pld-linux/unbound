@@ -1,12 +1,12 @@
 #
 Summary:	Recursive, validating DNS server
 Name:		unbound
-Version:	1.4.15
+Version:	1.4.16
 Release:	1
 License:	BSD
 Group:		Applications
 Source0:	http://www.unbound.net/downloads/%{name}-%{version}.tar.gz
-# Source0-md5:	99173a6548e0e2ec9bfac7a5d025f79e
+# Source0-md5:	5158d03d2ab0a8e60925c7a9b9903631
 Source1:	%{name}.init
 URL:		http://unbound.net/
 BuildRequires:	ldns-devel >= 1.6.9
@@ -91,7 +91,7 @@ fi
 %dir %{_sysconfdir}/%{name}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/unbound.conf
 %attr(755,root,root) %{_libdir}/libunbound.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libunbound.so.3
+%attr(755,root,root) %ghost %{_libdir}/libunbound.so.2
 %attr(755,root,root) %{_sbindir}/unbound
 %attr(755,root,root) %{_sbindir}/unbound-anchor
 %attr(755,root,root) %{_sbindir}/unbound-checkconf
