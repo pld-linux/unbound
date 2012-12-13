@@ -5,12 +5,12 @@
 Summary:	Recursive, validating DNS resolver
 Summary(pl.UTF-8):	Rekurencyjny, weryfikujący resolver DNS
 Name:		unbound
-Version:	1.4.18
-Release:	2
+Version:	1.4.19
+Release:	1
 License:	BSD
 Group:		Applications/Network
 Source0:	http://www.unbound.net/downloads/%{name}-%{version}.tar.gz
-# Source0-md5:	2cad65b6a2d08bb6e0210ea92156ca4b
+# Source0-md5:	39f121e1921c7b5ad2f05a4d756a0487
 Source1:	%{name}.init
 URL:		http://unbound.net/
 BuildRequires:	expat-devel
@@ -169,6 +169,7 @@ fi
 %{_libdir}/libunbound.la
 %{_includedir}/unbound.h
 %{_mandir}/man3/libunbound.3*
+%{_mandir}/man3/ub_*.3*
 
 %files static
 %defattr(644,root,root,755)
