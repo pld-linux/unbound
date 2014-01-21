@@ -6,7 +6,7 @@ Summary:	Recursive, validating DNS resolver
 Summary(pl.UTF-8):	Rekurencyjny, weryfikujący resolver DNS
 Name:		unbound
 Version:	1.4.21
-Release:	1
+Release:	2
 License:	BSD
 Group:		Applications/Network
 Source0:	http://www.unbound.net/downloads/%{name}-%{version}.tar.gz
@@ -131,10 +131,18 @@ rm -rf $RPM_BUILD_ROOT
 /sbin/chkconfig --add %{name}
 %service %{name} restart
 
+%pre
+%useradd -u 196 -g 99 -d /tmp -s /bin/false -c "unbound user" unbound
+
 %preun
 if [ "$1" = "0" ]; then
 	%service -q %{name} stop
 	/sbin/chkconfig --del %{name}
+fi
+
+%postun
+if [ "$1" = "0" ]; then
+	%userremove unbound
 fi
 
 %post	libs -p /sbin/ldconfig
