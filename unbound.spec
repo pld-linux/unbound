@@ -23,6 +23,11 @@ BuildRequires:	python-devel >= 1:2.4.0
 BuildRequires:	swig-python
 %endif
 Requires(post,preun):	/sbin/chkconfig
+BuildRequires:  rpmbuild(macros) >= 1.202
+Provides:	user(unbound)
+Requires(postun):	/usr/sbin/userdel
+Requires(pre):	/bin/id
+Requires(pre):	/usr/sbin/useradd
 Requires:	%{name}-libs = %{version}-%{release}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
