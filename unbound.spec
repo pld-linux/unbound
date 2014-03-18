@@ -12,6 +12,11 @@ Group:		Applications/Network
 Source0:	http://www.unbound.net/downloads/%{name}-%{version}.tar.gz
 # Source0-md5:	59728c74fef8783f8bad1d7451eba97f
 Source1:	%{name}.init
+Source2:	%{name}.service
+Source3:	https://data.iana.org/root-anchors/icannbundle.pem
+# Source3-md5:	59774aba58dbde1049bdf4722fb4f02c
+Source4:	ftp://ftp.internic.net/domain/named.cache
+# Source4-md5:	b3b07a2944d29d1f5bd58fe2fe183148
 URL:		http://unbound.net/
 BuildRequires:	expat-devel
 BuildRequires:	libevent-devel
@@ -22,11 +27,12 @@ BuildRequires:	python-devel >= 1:2.4.0
 BuildRequires:	swig-python
 %endif
 Requires(post,preun):	/sbin/chkconfig
-BuildRequires:  rpmbuild(macros) >= 1.202
+BuildRequires:	rpmbuild(macros) >= 1.671
 Provides:	user(unbound)
 Requires(postun):	/usr/sbin/userdel
 Requires(pre):	/bin/id
 Requires(pre):	/usr/sbin/useradd
+Requires:	systemd-units >= 38
 Requires:	%{name}-libs = %{version}-%{release}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -109,16 +115,27 @@ Pythonowy interfejs do biblioteki unbound.
 
 %build
 %configure \
-	%{?with_python:--with-pyunbound}
+	%{?with_python:--with-pyunbound} \
+	--with-pidfile=/run/%{name}.pid \
+	--with-conf-file=%{_sysconfdir}/%{name}/%{name}.conf \
+	--with-rootkey-file=/var/lib/%{name}/root.key \
+	--with-rootcert-file=%{_sysconfdir}/%{name}/icannbundle.pem
+
 %{__make}
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
-install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
+install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,%{systemdunitdir},/var/lib/%{name}}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
+
+install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
+install %{SOURCE2} $RPM_BUILD_ROOT%{systemdunitdir}/%{name}.service
+install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/icannbundle.pem
+install %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/named.cache
+
+touch $RPM_BUILD_ROOT/var/lib/%{name}/root.key
 
 %if %{with python}
 %{__rm} $RPM_BUILD_ROOT%{py_sitedir}/_unbound.{la,a}
@@ -132,6 +149,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %post
 /sbin/chkconfig --add %{name}
+%systemd_post %{name}.service
 %service %{name} restart
 
 %pre
@@ -142,11 +160,16 @@ if [ "$1" = "0" ]; then
 	%service -q %{name} stop
 	/sbin/chkconfig --del %{name}
 fi
+%systemd_preun %{name}.service
 
 %postun
 if [ "$1" = "0" ]; then
 	%userremove unbound
 fi
+%systemd_reload
+
+%triggerpostun -- %{name} < 1.4.22-1
+%systemd_trigger %{name}.service
 
 %post	libs -p /sbin/ldconfig
 %postun	libs -p /sbin/ldconfig
@@ -155,8 +178,11 @@ fi
 %defattr(644,root,root,755)
 %doc doc/{CREDITS,Changelog,FEATURES,LICENSE,README,TODO,control_proto_spec.txt,example.conf,ietf67-design-02.pdf,requirements.txt}
 %attr(754,root,root) /etc/rc.d/init.d/unbound
+%{systemdunitdir}/%{name}.service
 %dir %{_sysconfdir}/%{name}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/unbound.conf
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/named.cache
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/icannbundle.pem
 %attr(755,root,root) %{_sbindir}/unbound
 %attr(755,root,root) %{_sbindir}/unbound-anchor
 %attr(755,root,root) %{_sbindir}/unbound-checkconf
@@ -168,6 +194,8 @@ fi
 %{_mandir}/man8/unbound.8*
 %{_mandir}/man8/unbound-anchor.8*
 %{_mandir}/man8/unbound-control*.8*
+%dir %attr(755,unbound,nobody) /var/lib/%{name}
+%ghost /var/lib/%{name}/root.key
 
 %files libs
 %defattr(644,root,root,755)

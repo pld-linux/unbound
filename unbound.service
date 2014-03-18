@@ -1,0 +1,17 @@
+[Unit]
+Description=Unbound DNS validating resolver
+Wants=nss-lookup.target
+Before=nss-lookup.target
+After=network.target
+
+[Service]
+Type=forking
+ExecStartPre=/usr/sbin/unbound-checkconf /etc/unbound/unbound.conf
+ExecStartPre=-/usr/sbin/unbound-anchor -v -a /var/lib/unbound/root.key
+ExecStart=/usr/sbin/unbound -c /etc/unbound/unbound.conf
+ExecReload=/usr/sbin/unbound-checkconf /etc/unbound/unbound.conf
+ExecReload=/bin/kill -HUP $MAINPID
+PIDFile=/run/unbound.pid
+
+[Install]
+WantedBy=multi-user.target

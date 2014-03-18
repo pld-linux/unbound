@@ -36,6 +36,10 @@ start() {
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/unbound ]; then
 		msg_starting "Unbound"
+
+		# prepare the root key file
+		/usr/sbin/unbound-anchor -v -a /var/lib/unbound/root.key
+
 	 	daemon /usr/sbin/unbound \
 			-c /etc/unbound/unbound.conf $UNBOUND_OPT </dev/null
 		RETVAL=$?
