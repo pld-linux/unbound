@@ -5,16 +5,15 @@
 Summary:	Recursive, validating DNS resolver
 Summary(pl.UTF-8):	Rekurencyjny, weryfikujący resolver DNS
 Name:		unbound
-Version:	1.4.21
-Release:	2
+Version:	1.4.22
+Release:	1
 License:	BSD
 Group:		Applications/Network
 Source0:	http://www.unbound.net/downloads/%{name}-%{version}.tar.gz
-# Source0-md5:	0aa8db06ea784bf7879060bd1f6551c8
+# Source0-md5:	59728c74fef8783f8bad1d7451eba97f
 Source1:	%{name}.init
 URL:		http://unbound.net/
 BuildRequires:	expat-devel
-BuildRequires:	ldns-devel >= 1.6.9
 BuildRequires:	libevent-devel
 BuildRequires:	openssl-devel
 BuildRequires:	rpmbuild(macros) >= 1.228
@@ -73,7 +72,6 @@ Summary:	Header files for unbound library
 Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki unbound
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
-Requires:	ldns-devel
 Requires:	openssl-devel
 
 %description devel
