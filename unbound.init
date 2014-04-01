@@ -38,9 +38,9 @@ start() {
 		msg_starting "Unbound"
 
 		# prepare the root key file
-		/usr/sbin/unbound-anchor -v -a /var/lib/unbound/root.key
+		/usr/sbin/unbound-anchor -v -a /var/lib/unbound/root.key > /dev/null
 
-	 	daemon /usr/sbin/unbound \
+		daemon /usr/sbin/unbound \
 			-c /etc/unbound/unbound.conf $UNBOUND_OPT </dev/null
 		RETVAL=$?
 		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/unbound
