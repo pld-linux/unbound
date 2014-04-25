@@ -17,6 +17,7 @@ Source3:	https://data.iana.org/root-anchors/icannbundle.pem
 # Source3-md5:	59774aba58dbde1049bdf4722fb4f02c
 Source4:	ftp://ftp.internic.net/domain/named.cache
 # Source4-md5:	b3b07a2944d29d1f5bd58fe2fe183148
+Patch0:		%{name}-default_trust_anchor.patch
 URL:		http://unbound.net/
 BuildRequires:	expat-devel
 BuildRequires:	libevent-devel
@@ -112,6 +113,7 @@ Pythonowy interfejs do biblioteki unbound.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
 %configure \
