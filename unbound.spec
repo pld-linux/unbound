@@ -117,6 +117,7 @@ Pythonowy interfejs do biblioteki unbound.
 %configure \
 	%{?with_python:--with-pyunbound} \
 	--with-pidfile=/run/%{name}.pid \
+	--with-chroot-dir="" \
 	--with-conf-file=%{_sysconfdir}/%{name}/%{name}.conf \
 	--with-rootkey-file=/var/lib/%{name}/root.key \
 	--with-rootcert-file=%{_sysconfdir}/%{name}/icannbundle.pem
