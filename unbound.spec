@@ -5,18 +5,18 @@
 Summary:	Recursive, validating DNS resolver
 Summary(pl.UTF-8):	Rekurencyjny, weryfikujący resolver DNS
 Name:		unbound
-Version:	1.4.22
-Release:	2
+Version:	1.5.1
+Release:	1
 License:	BSD
 Group:		Applications/Network
 Source0:	http://www.unbound.net/downloads/%{name}-%{version}.tar.gz
-# Source0-md5:	59728c74fef8783f8bad1d7451eba97f
+# Source0-md5:	ed4c46476dcfb8a507cc08b1ba12a8f1
 Source1:	%{name}.init
 Source2:	%{name}.service
 Source3:	https://data.iana.org/root-anchors/icannbundle.pem
 # Source3-md5:	59774aba58dbde1049bdf4722fb4f02c
 Source4:	ftp://ftp.internic.net/domain/named.cache
-# Source4-md5:	b3b07a2944d29d1f5bd58fe2fe183148
+# Source4-md5:	89241448b08af70dd5715e7ef12d71f6
 Patch0:		%{name}-default_trust_anchor.patch
 URL:		http://unbound.net/
 BuildRequires:	expat-devel
@@ -141,7 +141,7 @@ install %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/named.cache
 touch $RPM_BUILD_ROOT/var/lib/%{name}/root.key
 
 %if %{with python}
-%{__rm} $RPM_BUILD_ROOT%{py_sitedir}/_unbound.{la,a}
+%{__rm} $RPM_BUILD_ROOT%{py_sitedir}/_unbound.la
 %py_comp $RPM_BUILD_ROOT%{py_sitedir}
 %py_ocomp $RPM_BUILD_ROOT%{py_sitedir}
 %py_postclean
