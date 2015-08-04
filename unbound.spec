@@ -117,7 +117,8 @@ Pythonowy interfejs do biblioteki unbound.
 
 %build
 %configure \
-	%{?with_python:--with-pyunbound} \
+	%{__with_without python pyunbound} \
+	%{__with_without python pythonmodule} \
 	--with-pidfile=/run/%{name}.pid \
 	--with-chroot-dir="" \
 	--with-conf-file=%{_sysconfdir}/%{name}/%{name}.conf \
