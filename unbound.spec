@@ -5,18 +5,18 @@
 Summary:	Recursive, validating DNS resolver
 Summary(pl.UTF-8):	Rekurencyjny, weryfikujący resolver DNS
 Name:		unbound
-Version:	1.5.3
+Version:	1.5.4
 Release:	1
 License:	BSD
 Group:		Applications/Network
 Source0:	http://www.unbound.net/downloads/%{name}-%{version}.tar.gz
-# Source0-md5:	1e95fdcbaaf5dc87432d898006a5eb13
+# Source0-md5:	f85854baad15adc7ce8acefe6cda4cf8
 Source1:	%{name}.init
 Source2:	%{name}.service
 Source3:	https://data.iana.org/root-anchors/icannbundle.pem
-# Source3-md5:	59774aba58dbde1049bdf4722fb4f02c
+# Source3-md5:	1ad315c80d044eca2da29785eee6f7c3
 Source4:	ftp://ftp.internic.net/domain/named.cache
-# Source4-md5:	89241448b08af70dd5715e7ef12d71f6
+# Source4-md5:	b2afc34d106e104730b63876c9a07caf
 Patch0:		%{name}-default_trust_anchor.patch
 URL:		http://unbound.net/
 BuildRequires:	expat-devel
@@ -223,4 +223,5 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{py_sitedir}/_unbound.so*
 %{py_sitedir}/unbound.py[co]
+%{py_sitedir}/unboundmodule.py[co]
 %endif
