@@ -1,7 +1,7 @@
-# TODO: dnstap? (BR: protobuf-c-devel, libfstrm -devel)
 #
 # Conditional build:
 %bcond_without	python	# Python binding
+%bcond_with	dnstap	# dnstap replication support
 #
 Summary:	Recursive, validating DNS resolver
 Summary(pl.UTF-8):	Rekurencyjny, weryfikujący resolver DNS
@@ -24,9 +24,11 @@ URL:		http://unbound.net/
 BuildRequires:	autoconf >= 2.56
 BuildRequires:	automake
 BuildRequires:	expat-devel
+%{?with_dnstap:BuildRequires:	fstrm-devel}
 BuildRequires:	libevent-devel
 BuildRequires:	libtool
 BuildRequires:	openssl-devel >= 1.0
+%{?with_dnstap:BuildRequires:	protobuf-c-devel}
 BuildRequires:	rpmbuild(macros) >= 1.228
 %if %{with python}
 BuildRequires:	python-devel >= 1:2.4.0
@@ -127,6 +129,7 @@ Pythonowy interfejs do biblioteki unbound.
 %{__autoconf}
 %{__autoheader}
 %configure \
+	%{?with_dnstap:--enable-dnstap} \
 	%{__with_without python pyunbound} \
 	%{__with_without python pythonmodule} \
 	--with-pidfile=/run/%{name}.pid \
