@@ -1,3 +1,4 @@
+# TODO: dnstap? (BR: protobuf-c-devel, libfstrm -devel)
 #
 # Conditional build:
 %bcond_without	python	# Python binding
@@ -5,12 +6,12 @@
 Summary:	Recursive, validating DNS resolver
 Summary(pl.UTF-8):	Rekurencyjny, weryfikujący resolver DNS
 Name:		unbound
-Version:	1.5.4
+Version:	1.5.6
 Release:	1
 License:	BSD
 Group:		Applications/Network
 Source0:	http://www.unbound.net/downloads/%{name}-%{version}.tar.gz
-# Source0-md5:	f85854baad15adc7ce8acefe6cda4cf8
+# Source0-md5:	691a34abd8e9257dd65b70f28326c1f0
 Source1:	%{name}.init
 Source2:	%{name}.service
 Source3:	https://data.iana.org/root-anchors/icannbundle.pem
@@ -18,10 +19,14 @@ Source3:	https://data.iana.org/root-anchors/icannbundle.pem
 Source4:	ftp://ftp.internic.net/domain/named.cache
 # Source4-md5:	b2afc34d106e104730b63876c9a07caf
 Patch0:		%{name}-default_trust_anchor.patch
+Patch1:		%{name}-sh.patch
 URL:		http://unbound.net/
+BuildRequires:	autoconf >= 2.56
+BuildRequires:	automake
 BuildRequires:	expat-devel
 BuildRequires:	libevent-devel
-BuildRequires:	openssl-devel
+BuildRequires:	libtool
+BuildRequires:	openssl-devel >= 1.0
 BuildRequires:	rpmbuild(macros) >= 1.228
 %if %{with python}
 BuildRequires:	python-devel >= 1:2.4.0
@@ -114,8 +119,13 @@ Pythonowy interfejs do biblioteki unbound.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %build
+%{__libtoolize}
+%{__aclocal}
+%{__autoconf}
+%{__autoheader}
 %configure \
 	%{__with_without python pyunbound} \
 	%{__with_without python pythonmodule} \
