@@ -2,16 +2,17 @@
 # Conditional build:
 %bcond_without	python	# Python binding
 %bcond_with	dnstap	# dnstap replication support
+%bcond_with	systemd	# systemd support
 #
 Summary:	Recursive, validating DNS resolver
 Summary(pl.UTF-8):	Rekurencyjny, weryfikujący resolver DNS
 Name:		unbound
-Version:	1.5.10
+Version:	1.6.1
 Release:	1
 License:	BSD
 Group:		Applications/Network
 Source0:	http://www.unbound.net/downloads/%{name}-%{version}.tar.gz
-# Source0-md5:	0a3a236811f1ab5c1dc31974fa74e047
+# Source0-md5:	aa808f33d94a36c9312d1b8ad8805e14
 Source1:	%{name}.init
 Source2:	%{name}.service
 Source3:	https://data.iana.org/root-anchors/icannbundle.pem
@@ -21,23 +22,26 @@ Source4:	ftp://ftp.internic.net/domain/named.cache
 Patch0:		%{name}-default_trust_anchor.patch
 Patch1:		%{name}-sh.patch
 Patch2:		%{name}-pythondir.patch
+Patch3:		%{name}-flex.patch
 URL:		http://unbound.net/
 BuildRequires:	autoconf >= 2.56
 BuildRequires:	automake
+BuildRequires:	bison
 BuildRequires:	expat-devel
+BuildRequires:	flex
 %{?with_dnstap:BuildRequires:	fstrm-devel}
 BuildRequires:	libevent-devel
 BuildRequires:	libtool
 BuildRequires:	openssl-devel >= 1.0
 %{?with_dnstap:BuildRequires:	protobuf-c-devel}
-BuildRequires:	rpmbuild(macros) >= 1.228
+BuildRequires:	rpmbuild(macros) >= 1.671
+%{?with_systemd:BuildRequires:	systemd-devel}
 %if %{with python}
 BuildRequires:	python-devel >= 1:2.4.0
 BuildRequires:	swig-python
 %endif
-Requires(post,preun):	/sbin/chkconfig
-BuildRequires:	rpmbuild(macros) >= 1.671
 Provides:	user(unbound)
+Requires(post,preun):	/sbin/chkconfig
 Requires(postun):	/usr/sbin/userdel
 Requires(pre):	/bin/id
 Requires(pre):	/usr/sbin/useradd
@@ -124,6 +128,7 @@ Pythonowy interfejs do biblioteki unbound.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %build
 %{__libtoolize}
@@ -132,6 +137,7 @@ Pythonowy interfejs do biblioteki unbound.
 %{__autoheader}
 %configure \
 	%{?with_dnstap:--enable-dnstap} \
+	%{?with_systemd:--enable-systemd} \
 	%{__with_without python pyunbound} \
 	%{__with_without python pythonmodule} \
 	--with-pidfile=/run/%{name}.pid \
