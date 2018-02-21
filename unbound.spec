@@ -8,7 +8,7 @@ Summary:	Recursive, validating DNS resolver
 Summary(pl.UTF-8):	Rekurencyjny, weryfikujący resolver DNS
 Name:		unbound
 Version:	1.6.8
-Release:	1
+Release:	2
 License:	BSD
 Group:		Applications/Network
 Source0:	http://www.unbound.net/downloads/%{name}-%{version}.tar.gz
@@ -23,6 +23,7 @@ Patch0:		%{name}-default_trust_anchor.patch
 Patch1:		%{name}-sh.patch
 Patch2:		%{name}-pythondir.patch
 Patch3:		%{name}-flex.patch
+Patch4:		unbound-bug-3512.patch
 URL:		http://unbound.net/
 BuildRequires:	autoconf >= 2.56
 BuildRequires:	automake
@@ -129,6 +130,7 @@ Pythonowy interfejs do biblioteki unbound.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 %build
 %{__libtoolize}
