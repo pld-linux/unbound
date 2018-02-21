@@ -3,12 +3,13 @@
 %bcond_without	python	# Python binding
 %bcond_with	dnstap	# dnstap replication support
 %bcond_with	systemd	# systemd support
+%bcond_without	tests
 #
 Summary:	Recursive, validating DNS resolver
 Summary(pl.UTF-8):	Rekurencyjny, weryfikujący resolver DNS
 Name:		unbound
 Version:	1.6.8
-Release:	2
+Release:	3
 License:	BSD
 Group:		Applications/Network
 Source0:	http://www.unbound.net/downloads/%{name}-%{version}.tar.gz
@@ -169,6 +170,10 @@ touch $RPM_BUILD_ROOT/var/lib/%{name}/root.key
 %py_comp $RPM_BUILD_ROOT%{py_sitedir}
 %py_ocomp $RPM_BUILD_ROOT%{py_sitedir}
 %py_postclean
+%endif
+
+%if %{with tests}
+%{__make} check
 %endif
 
 %clean
