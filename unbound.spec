@@ -1,3 +1,5 @@
+# FIXME:
+# - stop using nobody group
 #
 # Conditional build:
 %bcond_without	python	# Python binding
@@ -8,18 +10,18 @@
 Summary:	Recursive, validating DNS resolver
 Summary(pl.UTF-8):	Rekurencyjny, weryfikujący resolver DNS
 Name:		unbound
-Version:	1.6.8
-Release:	5
+Version:	1.7.0
+Release:	1
 License:	BSD
 Group:		Applications/Network
 Source0:	http://www.unbound.net/downloads/%{name}-%{version}.tar.gz
-# Source0-md5:	c9d26cef224b10705229d5072142636c
+# Source0-md5:	49937b5f99a6fc2de8c5f3bb22a54390
 Source1:	%{name}.init
 Source2:	%{name}.service
 Source3:	https://data.iana.org/root-anchors/icannbundle.pem
 # Source3-md5:	24a426d59b61524623695f1b849f159b
 Source4:	ftp://ftp.internic.net/domain/named.cache
-# Source4-md5:	f4a35c0015a679d1605c18d40aad7506
+# Source4-md5:	6e87fb13229b85feafd9cca631949d92
 Patch0:		%{name}-default_trust_anchor.patch
 Patch1:		%{name}-sh.patch
 Patch2:		%{name}-pythondir.patch
@@ -115,7 +117,7 @@ Statyczna biblioteka unbound.
 %package -n python-unbound
 Summary:	Python interface to unbound library
 Summary(pl.UTF-8):	Pythonowy interfejs do biblioteki unbound
-Group:		Python/Libraries
+Group:		Libraries/Python
 Requires:	%{name}-libs = %{version}-%{release}
 
 %description -n python-unbound
@@ -149,6 +151,10 @@ Pythonowy interfejs do biblioteki unbound.
 
 %{__make}
 
+%if %{with tests}
+%{__make} check
+%endif
+
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,%{systemdunitdir},/var/lib/%{name}}
@@ -156,10 +162,10 @@ install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,%{systemdunitdir},/var/lib/%{name}}
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
-install %{SOURCE2} $RPM_BUILD_ROOT%{systemdunitdir}/%{name}.service
-install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/icannbundle.pem
-install %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/named.cache
+cp -p %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
+cp -p %{SOURCE2} $RPM_BUILD_ROOT%{systemdunitdir}/%{name}.service
+cp -p %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/icannbundle.pem
+cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/named.cache
 
 touch $RPM_BUILD_ROOT/var/lib/%{name}/root.key
 
@@ -168,10 +174,6 @@ touch $RPM_BUILD_ROOT/var/lib/%{name}/root.key
 %py_comp $RPM_BUILD_ROOT%{py_sitedir}
 %py_ocomp $RPM_BUILD_ROOT%{py_sitedir}
 %py_postclean
-%endif
-
-%if %{with tests}
-%{__make} check
 %endif
 
 %clean
@@ -236,6 +238,7 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libunbound.so
 %{_libdir}/libunbound.la
+%{_pkgconfigdir}/libunbound.pc
 %{_includedir}/unbound.h
 %{_mandir}/man3/libunbound.3*
 %{_mandir}/man3/ub_*.3*
