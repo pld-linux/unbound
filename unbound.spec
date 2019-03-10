@@ -4,8 +4,9 @@
 # Conditional build:
 %bcond_without	python	# Python binding
 %bcond_with	dnstap	# dnstap replication support
+%bcond_with	redis	# cachedb support for redis (using hiredis)
 %bcond_with	systemd	# systemd support
-%bcond_without	tests
+%bcond_without	tests	# unit tests
 #
 Summary:	Recursive, validating DNS resolver
 Summary(pl.UTF-8):	Rekurencyjny, weryfikujący resolver DNS
@@ -30,18 +31,19 @@ URL:		http://unbound.net/
 BuildRequires:	autoconf >= 2.56
 BuildRequires:	automake
 BuildRequires:	bison
-BuildRequires:	expat-devel
+BuildRequires:	expat-devel >= 1.95
 BuildRequires:	flex
 %{?with_dnstap:BuildRequires:	fstrm-devel}
+%{?with_redis:BuildRequires:	hiredis-devel}
 BuildRequires:	libevent-devel
 BuildRequires:	libtool
-BuildRequires:	openssl-devel >= 1.0
+BuildRequires:	openssl-devel >= 1.0.0
 %{?with_dnstap:BuildRequires:	protobuf-c-devel}
 BuildRequires:	rpmbuild(macros) >= 1.671
 %{?with_systemd:BuildRequires:	systemd-devel}
 %if %{with python}
 BuildRequires:	python-devel >= 1:2.4.0
-BuildRequires:	swig-python
+BuildRequires:	swig-python >= 2.0.1
 %endif
 Provides:	user(unbound)
 Requires(post,preun):	/sbin/chkconfig
@@ -94,7 +96,7 @@ Summary:	Header files for unbound library
 Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki unbound
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
-Requires:	openssl-devel
+Requires:	openssl-devel >= 1.0.0
 
 %description devel
 Header files for unbound library.
@@ -141,12 +143,14 @@ Pythonowy interfejs do biblioteki unbound.
 %configure \
 	%{?with_dnstap:--enable-dnstap} \
 	%{?with_systemd:--enable-systemd} \
-	%{__with_without python pyunbound} \
-	%{__with_without python pythonmodule} \
-	--with-libevent \
-	--with-pidfile=/run/%{name}.pid \
 	--with-chroot-dir="" \
 	--with-conf-file=%{_sysconfdir}/%{name}/%{name}.conf \
+	--with-libevent=/usr \
+	--with-libexpat=/usr \
+	%{?with_redis:--with-libhiredis=/usr} \
+	--with-pidfile=/run/%{name}.pid \
+	%{__with_without python pyunbound} \
+	%{__with_without python pythonmodule} \
 	--with-rootkey-file=/var/lib/%{name}/root.key \
 	--with-rootcert-file=%{_sysconfdir}/%{name}/icannbundle.pem
 
