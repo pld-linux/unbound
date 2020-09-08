@@ -2,21 +2,22 @@
 # - stop using nobody group
 #
 # Conditional build:
-%bcond_without	python	# Python binding
-%bcond_with	dnstap	# dnstap replication support
-%bcond_with	redis	# cachedb support for redis (using hiredis)
-%bcond_with	systemd	# systemd support
-%bcond_without	tests	# unit tests
+%bcond_without	python		# Python binding
+%bcond_with	dnscrypt	# dnscrypt support
+%bcond_with	dnstap		# dnstap replication support
+%bcond_with	redis		# cachedb support for redis (using hiredis)
+%bcond_with	systemd		# systemd support
+%bcond_without	tests		# unit tests
 #
 Summary:	Recursive, validating DNS resolver
 Summary(pl.UTF-8):	Rekurencyjny, weryfikujący resolver DNS
 Name:		unbound
-Version:	1.10.1
+Version:	1.11.0
 Release:	1
 License:	BSD
 Group:		Applications/Network
 Source0:	http://www.unbound.net/downloads/%{name}-%{version}.tar.gz
-# Source0-md5:	48f8ee02d0d92603a8d7f4fda7152da0
+# Source0-md5:	528dcf9bb9aa693a14f9ad5bab417b85
 Source1:	%{name}.init
 Source2:	%{name}.service
 Source3:	https://data.iana.org/root-anchors/icannbundle.pem
@@ -36,6 +37,7 @@ BuildRequires:	flex
 %{?with_dnstap:BuildRequires:	fstrm-devel}
 %{?with_redis:BuildRequires:	hiredis-devel}
 BuildRequires:	libevent-devel
+%{?with_dnscrypt:BuildRequires:	libsodium-devel}
 BuildRequires:	libtool
 BuildRequires:	openssl-devel >= 1.0.0
 %{?with_dnstap:BuildRequires:	protobuf-c-devel}
@@ -141,6 +143,7 @@ Pythonowy interfejs do biblioteki unbound.
 %{__autoconf}
 %{__autoheader}
 %configure \
+	%{?with_dnscrypt:--enable-dnscrypt} \
 	%{?with_dnstap:--enable-dnstap} \
 	%{?with_systemd:--enable-systemd} \
 	--with-chroot-dir="" \
@@ -173,6 +176,9 @@ cp -p %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/icannbundle.pem
 cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/named.cache
 
 touch $RPM_BUILD_ROOT/var/lib/%{name}/root.key
+
+# obsoleted by pkg-config
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/libunbound.la
 
 %if %{with python}
 %{__rm} $RPM_BUILD_ROOT%{py_sitedir}/_unbound.la
@@ -242,7 +248,6 @@ fi
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libunbound.so
-%{_libdir}/libunbound.la
 %{_pkgconfigdir}/libunbound.pc
 %{_includedir}/unbound.h
 %{_mandir}/man3/libunbound.3*
