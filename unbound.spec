@@ -16,7 +16,7 @@ Version:	1.13.1
 Release:	2
 License:	BSD
 Group:		Applications/Network
-Source0:	http://www.unbound.net/downloads/%{name}-%{version}.tar.gz
+Source0:	https://www.unbound.net/downloads/%{name}-%{version}.tar.gz
 # Source0-md5:	0cd660a40d733acc6e7cce43731cac62
 Source1:	%{name}.init
 Source2:	%{name}.service
