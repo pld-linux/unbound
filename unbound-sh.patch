@@ -1,7 +1,7 @@
 --- unbound-1.5.6/configure.ac.orig	2015-10-06 12:29:20.000000000 +0200
 +++ unbound-1.5.6/configure.ac	2015-11-02 16:42:08.808434766 +0100
 @@ -479,7 +479,7 @@
- 		AC_ERROR([Python version >= 2.4.0 is required])
+ 		AC_MSG_ERROR([Python version >= 2.4.0 is required])
  	fi
  
 -      [PY_MAJOR_VERSION="`$PYTHON -c \"import sys; print(sys.version_info[0])\"`"]

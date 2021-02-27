@@ -8,5 +8,5 @@ diff -dur unbound-1.4.22.orig/doc/example.conf.in unbound-1.4.22/doc/example.con
 -	# auto-trust-anchor-file: "@UNBOUND_ROOTKEY_FILE@"
 +	auto-trust-anchor-file: "@UNBOUND_ROOTKEY_FILE@"
  
- 	# File with DLV trusted keys. Same format as trust-anchor-file.
- 	# There can be only one DLV configured, it is trusted from root down.
+ 	# trust anchor signaling sends a RFC8145 key tag query after priming.
+ 	# trust-anchor-signaling: yes
