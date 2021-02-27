@@ -13,7 +13,7 @@ Summary:	Recursive, validating DNS resolver
 Summary(pl.UTF-8):	Rekurencyjny, weryfikujący resolver DNS
 Name:		unbound
 Version:	1.13.1
-Release:	1
+Release:	2
 License:	BSD
 Group:		Applications/Network
 Source0:	http://www.unbound.net/downloads/%{name}-%{version}.tar.gz
@@ -44,7 +44,7 @@ BuildRequires:	openssl-devel >= 1.0.0
 BuildRequires:	rpmbuild(macros) >= 1.671
 %{?with_systemd:BuildRequires:	systemd-devel}
 %if %{with python}
-BuildRequires:	python-devel >= 1:2.4.0
+BuildRequires:	python3-devel
 BuildRequires:	swig-python >= 2.0.1
 %endif
 Provides:	user(unbound)
@@ -118,16 +118,17 @@ Static unbound library.
 %description static -l pl.UTF-8
 Statyczna biblioteka unbound.
 
-%package -n python-unbound
+%package -n python3-unbound
 Summary:	Python interface to unbound library
 Summary(pl.UTF-8):	Pythonowy interfejs do biblioteki unbound
 Group:		Libraries/Python
 Requires:	%{name}-libs = %{version}-%{release}
+Obsoletes:	python-unbound < 1.13.1-2
 
-%description -n python-unbound
+%description -n python3-unbound
 Python interface to unbound library.
 
-%description -n python-unbound -l pl.UTF-8
+%description -n python3-unbound -l pl.UTF-8
 Pythonowy interfejs do biblioteki unbound.
 
 %prep
@@ -143,6 +144,7 @@ Pythonowy interfejs do biblioteki unbound.
 %{__autoconf}
 %{__autoheader}
 %configure \
+	PYTHON=%{__python3} \
 	%{?with_dnscrypt:--enable-dnscrypt} \
 	%{?with_dnstap:--enable-dnstap} \
 	%{?with_systemd:--enable-systemd} \
@@ -181,10 +183,9 @@ touch $RPM_BUILD_ROOT/var/lib/%{name}/root.key
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/libunbound.la
 
 %if %{with python}
-%{__rm} $RPM_BUILD_ROOT%{py_sitedir}/_unbound.la
-%py_comp $RPM_BUILD_ROOT%{py_sitedir}
-%py_ocomp $RPM_BUILD_ROOT%{py_sitedir}
-%py_postclean
+%{__rm} $RPM_BUILD_ROOT%{py3_sitedir}/_unbound.la
+%py3_comp $RPM_BUILD_ROOT%{py3_sitedir}
+%py3_ocomp $RPM_BUILD_ROOT%{py3_sitedir}
 %endif
 
 %clean
@@ -258,9 +259,10 @@ fi
 %{_libdir}/libunbound.a
 
 %if %{with python}
-%files -n python-unbound
+%files -n python3-unbound
 %defattr(644,root,root,755)
-%attr(755,root,root) %{py_sitedir}/_unbound.so*
-%{py_sitedir}/unbound.py[co]
-%{py_sitedir}/unboundmodule.py[co]
+%attr(755,root,root) %{py3_sitedir}/_unbound.so*
+%{py3_sitedir}/__pycache__/unbound*.pyc
+%{py3_sitedir}/unbound.py
+%{py3_sitedir}/unboundmodule.py
 %endif
