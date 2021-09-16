@@ -54,6 +54,7 @@ Requires(pre):	/bin/id
 Requires(pre):	/usr/sbin/useradd
 Requires:	systemd-units >= 38
 Requires:	%{name}-libs = %{version}-%{release}
+Suggests:	openssl-tools
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
