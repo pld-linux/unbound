@@ -12,12 +12,12 @@
 Summary:	Recursive, validating DNS resolver
 Summary(pl.UTF-8):	Rekurencyjny, weryfikujący resolver DNS
 Name:		unbound
-Version:	1.15.0
-Release:	2
+Version:	1.16.0
+Release:	1
 License:	BSD
 Group:		Applications/Network
 Source0:	https://www.unbound.net/downloads/%{name}-%{version}.tar.gz
-# Source0-md5:	9a309ea06df20b1f6fc2c10b826082ef
+# Source0-md5:	3668c76b195be17ccd2b78ae501d8b3f
 Source1:	%{name}.init
 Source2:	%{name}.service
 Source3:	https://data.iana.org/root-anchors/icannbundle.pem
@@ -26,8 +26,6 @@ Source4:	ftp://ftp.internic.net/domain/named.cache
 # Source4-md5:	174738e23c506ddb1b5c24178e5fdc13
 Patch0:		%{name}-default_trust_anchor.patch
 Patch1:		%{name}-sh.patch
-Patch2:		%{name}-pythondir.patch
-Patch3:		%{name}-flex.patch
 URL:		http://unbound.net/
 BuildRequires:	autoconf >= 2.56
 BuildRequires:	automake
@@ -136,8 +134,6 @@ Pythonowy interfejs do biblioteki unbound.
 %setup -q
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
-%patch3 -p1
 
 %build
 %{__libtoolize}
