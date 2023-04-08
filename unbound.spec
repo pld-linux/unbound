@@ -220,8 +220,8 @@ fi
 %doc doc/{CREDITS,Changelog,FEATURES,LICENSE,README,TODO,control_proto_spec.txt,example.conf,ietf67-design-02.pdf,requirements.txt}
 %attr(754,root,root) /etc/rc.d/init.d/unbound
 %{systemdunitdir}/%{name}.service
-%dir %{_sysconfdir}/%{name}
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/unbound.conf
+%attr(751,unbound,root) %dir %{_sysconfdir}/%{name}
+%attr(640,unbound,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/unbound.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/named.cache
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/icannbundle.pem
 %attr(755,root,root) %{_sbindir}/unbound
