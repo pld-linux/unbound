@@ -43,6 +43,7 @@ BuildRequires:	rpmbuild(macros) >= 1.671
 %{?with_systemd:BuildRequires:	systemd-devel}
 %if %{with python}
 BuildRequires:	python3-devel
+BuildRequires:	python3-modules
 BuildRequires:	swig-python >= 2.0.1
 %endif
 Provides:	user(unbound)
