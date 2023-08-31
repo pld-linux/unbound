@@ -12,18 +12,18 @@
 Summary:	Recursive, validating DNS resolver
 Summary(pl.UTF-8):	Rekurencyjny, weryfikujący resolver DNS
 Name:		unbound
-Version:	1.17.1
+Version:	1.18.0
 Release:	1
 License:	BSD
 Group:		Applications/Network
 Source0:	https://www.unbound.net/downloads/%{name}-%{version}.tar.gz
-# Source0-md5:	bb96df2dc579c11ada537dbc52781abc
+# Source0-md5:	67d5bb4ce2a9d6e52d2bc4af982fb340
 Source1:	%{name}.init
 Source2:	%{name}.service
 Source3:	https://data.iana.org/root-anchors/icannbundle.pem
 # Source3-md5:	d00ef4e253e99e93ee020da5ad5e7d9a
 Source4:	ftp://ftp.internic.net/domain/named.cache
-# Source4-md5:	12ecc90635bdb36e2c50e83f1e0dcb90
+# Source4-md5:	9ff7963fd8b39b01a5cb48bf46af364f
 Patch0:		%{name}-default_trust_anchor.patch
 Patch1:		%{name}-sh.patch
 URL:		http://unbound.net/
@@ -37,6 +37,7 @@ BuildRequires:	flex
 BuildRequires:	libevent-devel
 %{?with_dnscrypt:BuildRequires:	libsodium-devel}
 BuildRequires:	libtool
+BuildRequires:	linux-libc-headers >= 7:2.6.30
 BuildRequires:	openssl-devel >= 1.0.0
 %{?with_dnstap:BuildRequires:	protobuf-c-devel}
 BuildRequires:	rpmbuild(macros) >= 1.671
