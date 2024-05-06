@@ -70,29 +70,15 @@ case "$1" in
 	;;
   status)
 	status unbound
-	RETVAL=$?
-	if [ -f /etc/rndc.conf ]; then
-		/usr/sbin/rndc status
-		RET=$?
-		if [ $RET -ne 0 ]; then
-			RETVAL=$RET
-		fi
-	fi
 	;;
   reload|force-reload)
 	if [ -f /var/lock/subsys/unbound ]; then
-		if [ -f /etc/rndc.conf ]; then
-			run_cmd "$(nls 'Reloading %s service' 'Unbound')" /usr/sbin/rndc reload
-		else
-			msg_reloading "Unbound"
-			killproc unbound -HUP
-			RETVAL=$?
-		fi
+		msg_reloading "Unbound"
+		killproc unbound -HUP
 	else
 		msg_not_running "Unbound"
 		exit 7
 	fi
-
 	;;
   restart)
 	stop
