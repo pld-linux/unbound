@@ -12,18 +12,18 @@
 Summary:	Recursive, validating DNS resolver
 Summary(pl.UTF-8):	Rekurencyjny, weryfikujący resolver DNS
 Name:		unbound
-Version:	1.19.3
-Release:	2
+Version:	1.20.0
+Release:	1
 License:	BSD
 Group:		Applications/Network
 Source0:	https://www.unbound.net/downloads/%{name}-%{version}.tar.gz
-# Source0-md5:	00bf61460c87c2542bcb68d52a2e5195
+# Source0-md5:	970d8a8800e6993d4453d50979b0c657
 Source1:	%{name}.init
 Source2:	%{name}.service
 Source3:	https://data.iana.org/root-anchors/icannbundle.pem
 # Source3-md5:	d00ef4e253e99e93ee020da5ad5e7d9a
 Source4:	ftp://ftp.internic.net/domain/named.cache
-# Source4-md5:	a551fabe906ec055e7f563276dad9c35
+# Source4-md5:	256a3e44f5821c498cf777dd118944a6
 Patch0:		%{name}-default_trust_anchor.patch
 Patch1:		%{name}-sh.patch
 URL:		http://unbound.net/
