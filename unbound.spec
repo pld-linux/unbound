@@ -6,6 +6,7 @@
 %bcond_with	dnscrypt	# dnscrypt support
 %bcond_with	dnstap		# dnstap replication support
 %bcond_with	redis		# cachedb support for redis (using hiredis)
+%bcond_without	static_libs	# static library
 %bcond_with	systemd		# systemd support
 %bcond_without	tests		# unit tests
 #
@@ -144,6 +145,7 @@ Pythonowy interfejs do biblioteki unbound.
 %{__autoheader}
 %configure \
 	PYTHON=%{__python3} \
+	%{__enable_disable static_libs static} \
 	%{?with_dnscrypt:--enable-dnscrypt} \
 	%{?with_dnstap:--enable-dnstap} \
 	%{?with_systemd:--enable-systemd} \
@@ -253,9 +255,11 @@ fi
 %{_mandir}/man3/libunbound.3*
 %{_mandir}/man3/ub_*.3*
 
+%if %{with static_libs}
 %files static
 %defattr(644,root,root,755)
 %{_libdir}/libunbound.a
+%endif
 
 %if %{with python}
 %files -n python3-unbound
