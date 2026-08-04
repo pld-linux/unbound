@@ -5,13 +5,13 @@ Before=nss-lookup.target
 After=network.target
 
 [Service]
-Type=forking
+Type=notify
+NotifyAccess=main
 ExecStartPre=-/usr/sbin/unbound-anchor -v -a /var/lib/unbound/root.key
 ExecStartPre=/usr/sbin/unbound-checkconf /etc/unbound/unbound.conf
-ExecStart=/usr/sbin/unbound -c /etc/unbound/unbound.conf
+ExecStart=/usr/sbin/unbound -d -p -c /etc/unbound/unbound.conf
 ExecReload=/usr/sbin/unbound-checkconf /etc/unbound/unbound.conf
 ExecReload=/bin/kill -HUP $MAINPID
-PIDFile=/run/unbound.pid
 
 [Install]
 WantedBy=multi-user.target

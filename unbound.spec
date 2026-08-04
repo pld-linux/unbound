@@ -4,27 +4,28 @@
 # Conditional build:
 %bcond_without	python		# Python binding
 %bcond_with	dnscrypt	# dnscrypt support
-%bcond_with	dnstap		# dnstap replication support
+%bcond_without	dnstap		# dnstap replication support
+%bcond_without	doh		# DNS over HTTPS support (nghttp2)
 %bcond_with	redis		# cachedb support for redis (using hiredis)
 %bcond_without	static_libs	# static library
-%bcond_with	systemd		# systemd support
+%bcond_without	systemd		# systemd support
 %bcond_without	tests		# unit tests
 #
 Summary:	Recursive, validating DNS resolver
 Summary(pl.UTF-8):	Rekurencyjny, weryfikujący resolver DNS
 Name:		unbound
-Version:	1.25.2
+Version:	1.26.0
 Release:	1
 License:	BSD
 Group:		Applications/Network
 Source0:	https://www.unbound.net/downloads/%{name}-%{version}.tar.gz
-# Source0-md5:	e387641957ace96c83c9e150c124b449
+# Source0-md5:	7dd70450e3f2d1473e89602a256abe3e
 Source1:	%{name}.init
 Source2:	%{name}.service
 Source3:	https://data.iana.org/root-anchors/icannbundle.pem
 # Source3-md5:	1f1cfd84c28747d911792ea5fbb25c7b
 Source4:	ftp://ftp.internic.net/domain/named.cache
-# Source4-md5:	e42e086bf0d6a4246fb9e691a755ed2d
+# Source4-md5:	e8be331a08e93e7bb05aa8da0426a7de
 Patch0:		%{name}-default_trust_anchor.patch
 Patch1:		%{name}-sh.patch
 URL:		http://unbound.net/
@@ -39,6 +40,7 @@ BuildRequires:	libevent-devel
 %{?with_dnscrypt:BuildRequires:	libsodium-devel}
 BuildRequires:	libtool
 BuildRequires:	linux-libc-headers >= 7:2.6.30
+%{?with_doh:BuildRequires:	nghttp2-devel}
 BuildRequires:	openssl-devel >= 1.0.0
 %{?with_dnstap:BuildRequires:	protobuf-c-devel}
 BuildRequires:	rpmbuild(macros) >= 1.671
@@ -148,12 +150,16 @@ Pythonowy interfejs do biblioteki unbound.
 	%{__enable_disable static_libs static} \
 	%{?with_dnscrypt:--enable-dnscrypt} \
 	%{?with_dnstap:--enable-dnstap} \
+	--enable-subnet \
 	%{?with_systemd:--enable-systemd} \
+	--enable-tfo-client \
+	--enable-tfo-server \
 	--with-chroot-dir="" \
 	--with-conf-file=%{_sysconfdir}/%{name}/%{name}.conf \
 	--with-libevent=/usr \
 	--with-libexpat=/usr \
 	%{?with_redis:--with-libhiredis=/usr} \
+	%{?with_doh:--with-libnghttp2=/usr} \
 	--with-pidfile=/run/%{name}.pid \
 	%{__with_without python pyunbound} \
 	%{__with_without python pythonmodule} \
