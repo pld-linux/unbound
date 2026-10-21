@@ -28,6 +28,7 @@ Source4:	ftp://ftp.internic.net/domain/named.cache
 # Source4-md5:	d838c53bc4d2afc02caefe5dee4b1b2e
 Patch0:		%{name}-default_trust_anchor.patch
 Patch1:		%{name}-sh.patch
+Patch2:		swig4.5.patch
 URL:		http://unbound.net/
 BuildRequires:	autoconf >= 2.56
 BuildRequires:	automake
@@ -139,6 +140,7 @@ Pythonowy interfejs do biblioteki unbound.
 %setup -q
 %patch -P 0 -p1
 %patch -P 1 -p1
+%patch -P 2 -p1
 
 %build
 %{__libtoolize}
